@@ -1,12 +1,16 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class JavaExercises {
 
     /** Returns an array [1, 2, 3, 4, 5, 6] */
     public static int[] makeDice() {
-        // TODO: Fill in this function.
-        return null;
+        int[] dice = new int[6];
+        for (int i = 0; i <= 5; ++i) {
+            dice[i] = i + 1;
+        }
+        return dice;
     }
 
     /** Returns the order depending on the customer.
@@ -14,15 +18,33 @@ public class JavaExercises {
      *  If the customer is Erik, return ["sushi", "pasta", "avocado", "coffee"].
      *  In any other case, return an empty String[] of size 3. */
     public static String[] takeOrder(String customer) {
-        // TODO: Fill in this function.
-        return null;
+        String[] order = new String[4];
+        if (Objects.equals(customer, "Ergun")) {
+            order[0] = "beyti";
+            order[1] = "pizza";
+            order[2] = "hamburger";
+            order[3] = "tea";
+        } else if (Objects.equals(customer, "Erik")) {
+            order[0] = "sushi";
+            order[1] = "pasta";
+            order[2] = "avocado";
+            order[3] = "coffee";
+        } else {
+            order = new String[3];
+        }
+        return order;
     }
 
     /** Returns the positive difference between the maximum element and minimum element of the given array.
      *  Assumes array is nonempty. */
     public static int findMinMax(int[] array) {
-        // TODO: Fill in this function.
-        return 0;
+        // Dont forget the Integer's MIN_VALUE & MAX_VALUE
+        int tem_max = Integer.MIN_VALUE, tem_min = Integer.MAX_VALUE;
+        for (int j : array) {
+            tem_max = Math.max(j, tem_max);
+            tem_min = Math.min(j, tem_min);
+        }
+        return tem_max - tem_min;
     }
 
     /**
@@ -38,8 +60,14 @@ public class JavaExercises {
     }
 
     private static List<Integer> hailstoneHelper(int x, List<Integer> list) {
-        // TODO: Fill in this function.
-        return null;
+        list.add(x);
+        if (x == 1) {
+            return list;
+        } else if (x % 2 == 0) {
+            x /= 2;
+        } else {
+            x = 3 * x + 1;
+        }
+        return hailstoneHelper(x, list);
     }
-
 }
