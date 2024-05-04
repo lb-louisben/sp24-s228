@@ -5,6 +5,7 @@ import game2048rendering.Side;
 import game2048rendering.Tile;
 
 import java.util.Formatter;
+import java.util.Objects;
 
 
 /** The state of a game of 2048.
@@ -84,7 +85,13 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 2. Fill in this function.
+        for (int i = 0; i < size(); ++i) {
+            for (int j = 0; j < size(); ++j) {
+                if (tile(i, j) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -94,7 +101,13 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 3. Fill in this function.
+        for (int i = 0; i < size(); ++i) {
+            for (int j = 0; j < size(); ++j) {
+                if (tile(i, j) != null && tile(i, j).value() == 2048) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -105,13 +118,22 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Fill in this function.
+        // 3x3 area
+        for (int r = 0; r < size(); r++) {
+            for (int c = 0; c < size(); c++) {
+                if (tile(r, c) == null)
+                    return true;
+                if (c > 0 && tile(r, c).value() == tile(r, c - 1).value())
+                    return true;
+                if (r > 0 && tile(r, c).value() == tile(r - 1, c).value())
+                    return true;
+            }
+        }
         return false;
     }
 
     /**
      * Moves the tile at position (x, y) as far up as possible.
-     *
      * Rules for Tilt:
      * 1. If two Tiles are adjacent in the direction of motion and have
      *    the same value, they are merged into one Tile of twice the original
@@ -124,27 +146,93 @@ public class Model {
      *    and the trailing tile does not.
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
+        // current tile in (x, y) position, mostly it is on the left-top corner.
         Tile currTile = board.tile(x, y);
+        // record its value
         int myValue = currTile.value();
+        // target Y position
         int targetY = y;
+        // checks the value same or not
+        int checkValue;
+
+        boolean needMerge = false;
+
+
+        /* Checks the currentTile is not null */
+        // if (Objects.equals(currTile, null) || y == 3) {
+        if (y == size()) {
+            return;
+        } else {
+            /* Iterates the most y position */
+            for (int checkY = y + 1; checkY < size(); checkY++) {
+                Tile tileAbove = board.tile(x, checkY);
+                if (Objects.isNull(tileAbove)) {
+                    targetY = checkY;
+                } else {
+                    checkValue = tile(x, checkY).value();
+                    if (checkValue == myValue && !tileAbove.wasMerged()) {
+                        targetY = checkY;
+                        needMerge = true;
+                    }
+                    break;
+                }
+            }
+        }
+
+
+        /* Moves to the target y position */
+        if (targetY != y) {
+            board.move(x, targetY, currTile);
+            if (needMerge) {
+                currTile.wasMerged();
+                score += 2 * currTile.value();
+                if (score >= MAX_PIECE)
+                    return;
+            }
+        }
 
         // TODO: Tasks 5, 6, and 10. Fill in this function.
     }
 
-    /** Handles the movements of the tilt in column x of the board
+    /**
+     * Handles the movements of the tilt in column x of the board
      * by moving every tile in the column as far up as possible.
      * The viewing perspective has already been set,
      * so we are tilting the tiles in this column up.
-     * */
+     */
     public void tiltColumn(int x) {
+        /* Gets current column top tile's Y. */
+        int topY = 0;
+
+        for (int r = 0; r < size(); r++) {
+            Tile checkTile = tile(x, r);
+            if (checkTile != null) {
+                topY = r;
+            }
+        }
+
+        for (int r = topY; r >= 0; r--) {
+            Tile checkTile = tile(x, r);
+            if (Objects.nonNull(checkTile))
+                moveTileUpAsFarAsPossible(x, r);
+        }
+
         // TODO: Task 7. Fill in this function.
+
     }
 
     public void tilt(Side side) {
+        board.setViewingPerspective(side);
+
+        for (int c = 0; c < size(); c++) {
+            tiltColumn(c);
+        }
+        board.setViewingPerspective(Side.NORTH);
         // TODO: Tasks 8 and 9. Fill in this function.
     }
 
-    /** Tilts every column of the board toward SIDE.
+    /**
+     * Tilts every column of the board toward SIDE.
      */
     public void tiltWrapper(Side side) {
         board.resetMerged();
