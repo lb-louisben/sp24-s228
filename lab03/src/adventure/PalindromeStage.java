@@ -68,6 +68,14 @@ public class PalindromeStage implements AdventureStage {
             reversed = new IntList(l.first, reversed);
             l = l.rest;
         }
+        /**
+         * fix bug:
+         *      if the last one input list's rest is null,
+         *      it works here
+         */
+        if (l.rest == null){
+            reversed = new IntList(l.first, reversed);
+        }
         return reversed;
     }
 
@@ -77,8 +85,12 @@ public class PalindromeStage implements AdventureStage {
      */
     private static IntList digitsToIntList(String s) {
         int[] a = new int[s.length()];
-        for (int i = s.length(); i > 0; i++) {
-            a[s.length() - i] = Character.getNumericValue(s.charAt(i));
+        /**
+         * fix bug:
+         *      Match the index to the value it stores
+         */
+        for (int i = s.length(); i > 0; i--) {
+            a[s.length() - i] = Character.getNumericValue(s.charAt(i-1));
         }
         return IntList.of(a);
     }
